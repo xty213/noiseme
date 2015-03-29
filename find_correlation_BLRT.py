@@ -135,13 +135,13 @@ for concept in xrange(1, IMAGE_LABEL_NUM + 1):
             BLRT = 2 * math.log((L111 * L222) / (L_11 * L_22))
             correlation.append((noiseme, concept, BLRT))
         except ZeroDivisionError:
-            sys.stderr.write('ZeroDivision\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d' % (noiseme, concept, k1, k2, n1, n2))
+            sys.stderr.write('ZeroDivision\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
         except ValueError:
-            sys.stderr.write('ValueError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d' % (noiseme, concept, k1, k2, n1, n2))
+            sys.stderr.write('ValueError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
         except OverflowError:
-            sys.stderr.write('OverflowError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d' % (noiseme, concept, k1, k2, n1, n2))
+            sys.stderr.write('OverflowError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
 
-correlation.sort(key = lambda x: x[2])
+correlation.sort(key = lambda x: x[2], reverse = True)
 
 for (noiseme, concept, BLRT) in correlation:
     print '%d\t%d\t%f' % (noiseme, concept, BLRT)
