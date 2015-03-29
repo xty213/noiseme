@@ -36,10 +36,8 @@ not_concept_dict = {}
 # init all the dictionaries
 for concept in xrange(1, IMAGE_LABEL_NUM + 1):
     concept_dict[concept] = 0
-    not_concept_dict[concept] = 0
     for noiseme in xrange(1, NOISEME_LABEL_NUM + 1):
         noiseme_and_concept_dict[(noiseme, concept)] = 0
-        noiseme_not_concept_dict[(noiseme, concept)] = 0
 
 # read keyframe image concepts
 for image_label_file_path in IMAGE_LABEL_FILES:
@@ -63,7 +61,8 @@ for image_label_file_path in IMAGE_LABEL_FILES:
                 except TypeError:
                     sys.stderr.write('TypeError: %s\n' % video_id)
                     sys.stderr.write('TypeError: %s\n' % keyframe)
-                    return
+                    noiseme_succ = False
+                    continue
                 else:
                     curr_noiseme_lines = f.readlines()
                     noiseme_succ = True
@@ -102,33 +101,47 @@ for image_label_file_path in IMAGE_LABEL_FILES:
                     concept_dict[concept_id] += 1
                     for noiseme_id in labels:
                         noiseme_and_concept_dict[(noiseme_id, concept_id)] += 1
-                # if we did not see the image concept
-                else:
-                    not_concept_dict[concept_id] += 1
-                    for noiseme_id in labels:
-                        noiseme_not_concept_dict[(noiseme_id, concept_id)] += 1
     finally:
         image_label_file.close()
 
-correlation = []
+# generate non-concept statistics
+noiseme_sum = {}
+concept_sum = 0
+for noiseme in xrange(1, NOISEME_LABEL_NUM + 1):
+    noiseme_sum[noiseme] = 0
+
+for concept in xrange(1, IMAGE_LABEL_NUM + 1):
+    concept_sum += concept_dict[concept]
+    for noiseme in xrange(1, NOISEME_LABEL_NUM + 1):
+        noiseme_sum[noiseme] += noiseme_and_concept_dict[(noiseme, concept)]
+
 # compute BLRT
+correlation = []
+k1 = k2 = n1 = n2 = 0
 for concept in xrange(1, IMAGE_LABEL_NUM + 1):
     for noiseme in xrange(1, NOISEME_LABEL_NUM + 1):
-        k1 = noiseme_and_concept_dict[(noiseme, concept)]
-        k2 = noiseme_not_concept_dict[(noiseme, concept)]
-        n1 = concept_dict[concept]
-        n2 = not_concept_dict[concept]
-        p = float(k1 + k2) / (n1 + n2)
-        p1 = float(k1 / n1)
-        p2 = float(k2 / n2)
-        L111 = (p1 ** k1) * ((1 - p1) ** (n1 - k1))
-        L222 = (p2 ** k2) * ((1 - p2) ** (n2 - k2))
-        L_11 = (p ** k1) * ((1 - p) ** (n1 - k1))
-        L_22 = (p ** k2) * ((1 - p) ** (n2 - k2))
-        BLRT = 2 * math.log((L111 * L222) / (L_11 * L_22))
-        correlation.append((noiseme, concept, BLRT))
+        try:
+            k1 = noiseme_and_concept_dict[(noiseme, concept)]
+            k2 = noiseme_sum[noiseme] - k1
+            n1 = concept_dict[concept]
+            n2 = concept_sum - n1
+            p = float(k1 + k2) / (n1 + n2)
+            p1 = float(k1) / n1
+            p2 = float(k2) / n2
+            L111 = (p1 ** k1) * ((1 - p1) ** (n1 - k1))
+            L222 = (p2 ** k2) * ((1 - p2) ** (n2 - k2))
+            L_11 = (p ** k1) * ((1 - p) ** (n1 - k1))
+            L_22 = (p ** k2) * ((1 - p) ** (n2 - k2))
+            BLRT = 2 * math.log((L111 * L222) / (L_11 * L_22))
+            correlation.append((noiseme, concept, BLRT))
+        except ZeroDivisionError:
+            sys.stderr.write('ZeroDivision\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d' % (noiseme, concept, k1, k2, n1, n2))
+        except ValueError:
+            sys.stderr.write('ValueError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d' % (noiseme, concept, k1, k2, n1, n2))
+        except OverflowError:
+            sys.stderr.write('OverflowError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d' % (noiseme, concept, k1, k2, n1, n2))
 
-correlation.sort(key = lambda x: x[2], reverse = True)
+correlation.sort(key = lambda x: x[2])
 
 for (noiseme, concept, BLRT) in correlation:
     print '%d\t%d\t%f' % (noiseme, concept, BLRT)
