@@ -1,7 +1,7 @@
 #!/bin/python
 
 import sys, math
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 #######################################
 #              CONSTANTS              #
@@ -84,7 +84,7 @@ for image_label_file_path in IMAGE_LABEL_FILES:
 
             # find positive noiseme labels in target time frame
             labels = set([])
-            for i in xrange(len(audio_info)):
+            for i in xrange(NOISEME_LABEL_NUM):
                 flag_and_score = audio_info[i].split(':')
                 if flag_and_score[0][0] == '1': # '1.0'[0] = '1'
                     if float(flag_and_score[1]) > NOISEME_LABEL_SCORE_THRESHOLD:
@@ -138,12 +138,14 @@ for concept in xrange(1, IMAGE_LABEL_NUM + 1):
             L_22 = (p ** k2) * ((1 - p) ** (n2 - k2))
             BLRT = 2 * math.log((L111 * L222) / (L_11 * L_22))
             correlation.append((noiseme, concept, BLRT))
+        except InvalidOperation:
+            sys.stderr.write('InvalidOperation\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
         except ValueError:
             sys.stderr.write('ValueError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
         except OverflowError:
             sys.stderr.write('OverflowError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
 
-correlation.sort(key = lambda x: x[2], reverse = True)
+correlation.sort(key=lambda x: x[2], reverse=True)
 
 for (noiseme, concept, BLRT) in correlation:
     print '%d\t%d\t%f' % (noiseme, concept, BLRT)
