@@ -1,6 +1,7 @@
 #!/bin/python
 
 import sys, math
+from decimal import Decimal
 
 #######################################
 #              CONSTANTS              #
@@ -119,23 +120,26 @@ for concept in xrange(1, IMAGE_LABEL_NUM + 1):
 correlation = []
 k1 = k2 = n1 = n2 = 0
 for concept in xrange(1, IMAGE_LABEL_NUM + 1):
+    # get n1 and n2
+    n1 = concept_dict[concept]
+    n2 = concept_sum - n1
+    if n1 == 0 or n2 == 0:
+        continue
+
     for noiseme in xrange(1, NOISEME_LABEL_NUM + 1):
         try:
             k1 = noiseme_and_concept_dict[(noiseme, concept)]
             k2 = noiseme_sum[noiseme] - k1
-            n1 = concept_dict[concept]
-            n2 = concept_sum - n1
-            p = float(k1 + k2) / (n1 + n2)
-            p1 = float(k1) / n1
-            p2 = float(k2) / n2
+
+            p = Decimal(k1 + k2) / (n1 + n2)
+            p1 = Decimal(k1) / n1
+            p2 = Decimal(k2) / n2
             L111 = (p1 ** k1) * ((1 - p1) ** (n1 - k1))
             L222 = (p2 ** k2) * ((1 - p2) ** (n2 - k2))
             L_11 = (p ** k1) * ((1 - p) ** (n1 - k1))
             L_22 = (p ** k2) * ((1 - p) ** (n2 - k2))
             BLRT = 2 * math.log((L111 * L222) / (L_11 * L_22))
             correlation.append((noiseme, concept, BLRT))
-        except ZeroDivisionError:
-            sys.stderr.write('ZeroDivision\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
         except ValueError:
             sys.stderr.write('ValueError\tnid:%d\tcid:%d\tk1:%d\tk2:%d\tn1:%d\tn2:%d\n' % (noiseme, concept, k1, k2, n1, n2))
         except OverflowError:
