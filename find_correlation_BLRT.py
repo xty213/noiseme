@@ -26,8 +26,6 @@ noiseme_succ = False
 
 noiseme_and_concept_dict = {}
 concept_dict = {}
-noiseme_not_concept_dict = {}
-not_concept_dict = {}
 
 
 #######################################
