@@ -68,5 +68,5 @@ if __name__ == "__main__":
 
     data = noiseme_duration_filter(data)
     data = image_reliability_filter(data)
-    data = merge_image_hierarchy(data)
+    # data = merge_image_hierarchy(data)
     print_data(data)
