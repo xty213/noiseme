@@ -1,0 +1,35 @@
+######## README ########
+
+1. Correlation Finding
+There are three different correlation finding algorithms, as described in https://bitbucket.org/fmetze/aladdin/wiki/Correlation-Finding.
+To run a specific correlation finding algorithm:
+$ python find_correlation_*.py 1>out 2>err
+Error messages (file/keyframe not found exceptions, etc.) will be printed to standard error.
+
+1.1. Naive Approach
+    # get nid-cid (noiseme id - image concept id) pairs and their scores
+    python scripts/find_correlation.py 1>out 2>err
+    # sort by nid-cid pairs
+    sort out > sorted
+    # aggregate the pairs with same noiseme_id - image_concept_id
+    python scripts/aggregate_correlation.py sorted > aggregated
+    # sort the aggregated correlations by score
+    sort -rk3 aggregated > final
+
+1.2. Probabilistic Approach
+    python scripts/find_correlation_prob.py 1>out 2>err
+
+1.3. BLRT Approach
+    python scripts/find_correlation_BLRT.py 1>out 2>err
+
+2. Normalization
+    python scripts/normalize.py out > normalized
+
+3. Correlation Fusion
+    python scripts/weighted_sum.py 1.out 2.out 3.out > weighted_sum
+
+4. Correlation Refinement
+    python scripts/refine.py weighted_sum > refined
+
+5. Build New Training Set
+    python scripts/build_train_set.py refined > training
