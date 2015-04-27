@@ -1,8 +1,8 @@
 #!/bin/python
 import sys
 
-IMAGE_CONCEPT_LIST = 'image_concepts/koalar.conceptids'
-NOISEME_LIST = 'audio_labels/noiseme.list'
+IMAGE_CONCEPT_LIST = '/Users/tianyux/Documents/775/project/repo/image_concepts/koalar.conceptids'
+NOISEME_LIST = '/Users/tianyux/Documents/775/project/repo/audio_labels/noiseme.list'
 
 # check for console parameters
 if (len(sys.argv) < 2):
@@ -36,7 +36,8 @@ try:
         pair, score = line.split('\t')
         if pair != curr_pair:
             if curr_pair != None:
-                print '%f\t%s\t%s\t:\t%s' % (curr_sum_score / curr_cnt, curr_pair, image_concepts[c_id], noisemes[n_id])
+                # print '%f\t%s\t%s\t:\t%s' % (curr_sum_score / curr_cnt, curr_pair, image_concepts[c_id], noisemes[n_id])
+                print '%s\t%s\t%f' % (curr_pair.split(':')[1], curr_pair.split(':')[0], curr_sum_score / curr_cnt)
             curr_pair = pair
             curr_sum_score = 0
             curr_cnt = 0
@@ -44,6 +45,7 @@ try:
             n_id = int(pair.split(':')[1]) - 1
         curr_sum_score += float(score)
         curr_cnt += 1
-    print '%f\t%s\t%s\t:\t%s' % (curr_sum_score / curr_cnt, curr_pair, image_concepts[c_id], noisemes[n_id])
+    # print '%f\t%s\t%s\t:\t%s' % (curr_sum_score / curr_cnt, curr_pair, image_concepts[c_id], noisemes[n_id])
+    print '%s\t%s\t%f' % (curr_pair.split(':')[1], curr_pair.split(':')[0], curr_sum_score / curr_cnt)
 finally:
     f.close()
