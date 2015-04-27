@@ -9,7 +9,6 @@ IMAGE_LABEL_FILES = ['/data/MM21/iyu/junk/proto/RESEARCH.koala.1000.shot.predict
                      '/data/MM21/iyu/junk/proto/PSTRAIN.koala.1000.shot.predict']
 AUDIO_LABEL_FOLDER = '/data/VOL2/yipeiw/share/submit2013/noiseme/confidence/2s_100ms_main/'
 FEATURE_FOLDER = '/data/VOL2/yipeiw/share/submit2013/noiseme/LS_2s_100ms/scale_mergeANDmfcc/'
-CORRELATION_PATH = 'refined.txt'
 
 IMAGE_LABEL_SCORE_THRESHOLD = 0.3
 
@@ -27,8 +26,12 @@ corr_set = set([])
 #              MAIN FUNC              #
 #######################################
 
+# check for console parameters
+if (len(sys.argv) < 2):
+    print('Usage: %s refined_correlations' % sys.argv[0])
+
 # read correlation set
-f = open(CORRELATION_PATH, 'r')
+f = open(sys.argv[1], 'r')
 for line in f:
     line_arr = line.split()
     corr_set.add((int(line_arr[0]), int(line_arr[1])))
