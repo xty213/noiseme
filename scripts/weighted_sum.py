@@ -1,12 +1,17 @@
 #!/bin/python
+import sys
 
 w1 = 0.2
 w2 = 0.2
 w3 = 0.6
 
-f1 = open("normalized_5000/1.txt", 'r')
-f2 = open("normalized_5000/2.txt", 'r')
-f3 = open("normalized_5000/3.txt", 'r')
+# check for console parameters
+if (len(sys.argv) < 4):
+    print('Usage: %s input1 input2 input3' % sys.argv[0])
+
+f1 = open(sys.argv[1], 'r')
+f2 = open(sys.argv[2], 'r')
+f3 = open(sys.argv[3], 'r')
 
 lines1 = f1.readlines()
 lines2 = f2.readlines()
