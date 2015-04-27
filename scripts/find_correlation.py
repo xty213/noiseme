@@ -9,7 +9,7 @@ IMAGE_LABEL_FILES = ['/data/MM21/iyu/junk/proto/RESEARCH.koala.1000.shot.predict
                      '/data/MM21/iyu/junk/proto/PSTRAIN.koala.1000.shot.predict']
 AUDIO_LABEL_FOLDER = '/data/VOL2/yipeiw/share/submit2013/noiseme/confidence/2s_100ms_main/'
 
-IMAGE_LABEL_SCORE_THRESHOLD = 0.1
+IMAGE_LABEL_SCORE_THRESHOLD = 0.3
 
 
 #######################################
