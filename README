@@ -33,3 +33,8 @@ Error messages (file/keyframe not found exceptions, etc.) will be printed to sta
 
 5. Build New Training Set
     python scripts/build_train_set.py refined > training
+
+*. Inspect Correlations
+    If you found some correlations unreasonable, use this script to inspect them:
+    python scripts/inspect_video.py > inspect_list
+    Modify TARGET_PAIRS in the script so that it will tell you the video (as well as the timestamp) where the target correlaitons appear.
