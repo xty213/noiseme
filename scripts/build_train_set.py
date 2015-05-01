@@ -27,8 +27,8 @@ corr_set = set([])
 #######################################
 
 # check for console parameters
-if (len(sys.argv) < 2):
-    print('Usage: %s refined_correlations' % sys.argv[0])
+if (len(sys.argv) < 3):
+    print('Usage: %s refined_correlations output_file' % sys.argv[0])
 
 # read correlation set
 f = open(sys.argv[1], 'r')
@@ -38,7 +38,7 @@ for line in f:
 f.close()
 # print corr_set
 
-out_file = open('train.txt', 'w+')
+out_file = open(sys.argv[2], 'w+')
 # read keyframe image concepts
 for image_label_file_path in IMAGE_LABEL_FILES:
     image_label_file = open(image_label_file_path, 'r')
@@ -79,10 +79,12 @@ for image_label_file_path in IMAGE_LABEL_FILES:
             second = time_arr[1][:-4] # '03.033.jpg'[:-4] = '03.033'
             line_num = int(minute) * 600 + int(float(second) * 10)
 
+            # expand from a 0.1s window to the whole second
+            end_idx = min(len(curr_feature_lines), line_num + 10)
+
             # get noiseme info in that time frame
             try:
                 audio_info = curr_noiseme_lines[line_num].split(' ')
-                audio_feature = curr_feature_lines[line_num]
             except IndexError:
                 sys.stderr.write('%s have:%d try:%d\n' % (video_id, len(curr_noiseme_lines), line_num))
                 continue
@@ -104,7 +106,8 @@ for image_label_file_path in IMAGE_LABEL_FILES:
                         # print (label, concept_id)
                         # if the correlation is in the "target correlations"
                         if (label, concept_id) in corr_set:
-                            out_file.write('%d %s' % (label, audio_feature))
+                            for idx in xrange(line_num, end_idx):
+                                out_file.write('%d %s' % (label, curr_feature_lines[idx]))
     finally:
         image_label_file.close()
 out_file.close()
