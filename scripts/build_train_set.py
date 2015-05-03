@@ -111,12 +111,12 @@ for image_label_file_path in IMAGE_LABEL_FILES:
                             out_file.write('%d %s' % (label, curr_feature_lines[line_num]))
                             # output the previous contiguous feature lines
                             curr_line_num = line_num - 1
-                            while curr_line_num >= 0 and curr_noiseme_lines[curr_line_num].split(' ')[label - 1].split(':')[0][0] == '1':
+                            while curr_line_num >= 0 and line_num - curr_line_num < 25 and curr_noiseme_lines[curr_line_num].split(' ')[label - 1].split(':')[0][0] == '1':
                                 out_file.write('%d %s' % (label, curr_feature_lines[curr_line_num]))
                                 curr_line_num -= 1
                             # output the later contiguous feature lines
                             curr_line_num = line_num + 1
-                            while curr_line_num < len(curr_noiseme_lines) and curr_noiseme_lines[curr_line_num].split(' ')[label - 1].split(':')[0][0] == '1':
+                            while curr_line_num < len(curr_noiseme_lines) and curr_line_num - line_num < 25 and curr_noiseme_lines[curr_line_num].split(' ')[label - 1].split(':')[0][0] == '1':
                                 out_file.write('%d %s' % (label, curr_feature_lines[curr_line_num]))
                                 curr_line_num += 1
     finally:
