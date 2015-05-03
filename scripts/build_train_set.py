@@ -80,7 +80,8 @@ for image_label_file_path in IMAGE_LABEL_FILES:
             line_num = int(minute) * 600 + int(float(second) * 10)
 
             # expand from a 0.1s window to the whole second
-            end_idx = min(len(curr_feature_lines), line_num + 10)
+            # bgn_idx = max(0, line_num - 5)
+            # end_idx = min(len(curr_feature_lines), line_num + 5)
 
             # get noiseme info in that time frame
             try:
@@ -106,8 +107,18 @@ for image_label_file_path in IMAGE_LABEL_FILES:
                         # print (label, concept_id)
                         # if the correlation is in the "target correlations"
                         if (label, concept_id) in corr_set:
-                            for idx in xrange(line_num, end_idx):
-                                out_file.write('%d %s' % (label, curr_feature_lines[idx]))
+                            # output the keyframe
+                            out_file.write('%d %s' % (label, curr_feature_lines[line_num]))
+                            # output the previous contiguous feature lines
+                            curr_line_num = line_num - 1
+                            while curr_line_num >= 0 and curr_noiseme_lines[curr_line_num].split(' ')[label - 1].split(':')[0][0] == '1':
+                                out_file.write('%d %s' % (label, curr_feature_lines[curr_line_num]))
+                                curr_line_num -= 1
+                            # output the later contiguous feature lines
+                            curr_line_num = line_num + 1
+                            while curr_line_num < len(curr_noiseme_lines) and curr_noiseme_lines[curr_line_num].split(' ')[label - 1].split(':')[0][0] == '1':
+                                out_file.write('%d %s' % (label, curr_feature_lines[curr_line_num]))
+                                curr_line_num += 1
     finally:
         image_label_file.close()
 out_file.close()
